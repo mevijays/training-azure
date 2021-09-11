@@ -1,0 +1,12 @@
+#cloud-config
+apt_update: true
+packages:
+  - apache2
+write_files:
+- owner: www-root:www-root
+  permissions: '0644'
+  content: |
+    <h1>KR Network Cloud Web! </h1><br>
+    <h1>Hello from VM2 </h1>
+
+  path: /var/www/html/index.html
