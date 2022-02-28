@@ -74,3 +74,15 @@
 
 
 ## [docs](docs/readme.md)
+
+
+
+## [Lab guide for AZ-900](https://mevijays.github.io/AZ-900T0x-MicrosoftAzureFundamentals/)
+
+
+## [Lab guide for AZ-104](https://github.com/mevijays/AZ-104-MicrosoftAzureAdministrator)
+
+
+## [Lab guide for AZ-305](https://github.com/mevijays/AZ-305-DesigningMicrosoftAzureInfrastructureSolutions)
+
+
