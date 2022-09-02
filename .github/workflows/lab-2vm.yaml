@@ -13,7 +13,7 @@ jobs:
   vmsetup:
     runs-on: ubuntu-latest
     if: ${{ github.event.inputs.TFACTION == 'create' }}
-    name: 'labvmrg'
+    name: 'labsetup'
     env:
       ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
