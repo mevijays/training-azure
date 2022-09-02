@@ -1,0 +1,29 @@
+name: setup lab prerequisites
+on:
+  workflow_dispatch:
+      inputs:
+      TFACTION:
+        default: "create"
+        required: true
+        type: choice
+        options:
+         - "create"
+         - "destroy"
+jobs:
+  labsetup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: 'Login via Azure CLI'
+        uses: azure/login@v1
+          with:
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: 'create resourceGroup'
+        if: ${{ github.event.inputs.TFACTION == 'create' }}
+        run: |-
+           az group create -l eastus -n krlabdemo
+           az storage account create -n krlabtfstate -g krlabdemo -l eastus --kind StorageV2 --sku Standard_LRS
+           az storage container create -n tfstate  --account-name krlabtfstate -g krlabdemo
+      - name: 'destroy resourceGroup'
+        if: ${{ github.event.inputs.TFACTION == 'destroy' }}
+        run: az group delete -g krlabdemo -y
