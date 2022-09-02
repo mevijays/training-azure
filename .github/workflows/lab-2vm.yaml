@@ -1,7 +1,14 @@
 name: setup vm lab1
 on:
   workflow_dispatch:
-  
+     inputs:
+      TFACTION:
+        default: "create"
+        required: true
+        type: choice
+        options:
+         - "create"
+         - "destroy" 
 jobs:
   vmsetup:
     runs-on: ubuntu-latest
@@ -32,3 +39,6 @@ jobs:
 
       - name: Terraform Apply
         run: terraform -chdir=terraform/lab-rgvnet apply -auto-approve -input=false
+      - name: Terraform destroy
+        if: ${{ github.event.inputs.TFACTION == 'destroy' }}
+        run: terraform -chdir=terraform/lab-rgvnet destroy -auto-approve -input=false
