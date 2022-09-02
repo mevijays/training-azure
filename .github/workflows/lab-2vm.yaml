@@ -1,0 +1,27 @@
+name: setup vm lab1
+on:
+  workflow_dispatch:
+jobs:
+  vmsetup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Login via Azure CLI'
+        uses: azure/login@v1
+        with:
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.2.5
+      # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+      - name: Terraform Init
+        run: terraform -chdir=terraform/lab-rgvnet init
+
+    # Generates an execution plan for Terraform
+      - name: Terraform Plan
+        run: terraform -chdir=terraform/lab-rgvnet plan -input=false
+
+      - name: Terraform Apply
+      run: terraform -chdir=terraform/lab-rgvnet apply -auto-approve -input=false
