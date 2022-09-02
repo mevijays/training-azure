@@ -1,7 +1,7 @@
 name: setup lab prerequisites
 on:
   workflow_dispatch:
-      inputs:
+    inputs:
       TFACTION:
         default: "create"
         required: true
@@ -13,7 +13,6 @@ jobs:
   labsetup:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
       - name: 'Login via Azure CLI'
         uses: azure/login@v1
           with:
