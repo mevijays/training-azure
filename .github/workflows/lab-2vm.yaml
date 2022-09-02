@@ -24,4 +24,4 @@ jobs:
         run: terraform -chdir=terraform/lab-rgvnet plan -input=false
 
       - name: Terraform Apply
-      run: terraform -chdir=terraform/lab-rgvnet apply -auto-approve -input=false
+        run: terraform -chdir=terraform/lab-rgvnet apply -auto-approve -input=false
