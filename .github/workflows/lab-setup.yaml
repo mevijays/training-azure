@@ -15,7 +15,7 @@ jobs:
     steps:
       - name: 'Login via Azure CLI'
         uses: azure/login@v1
-          with:
+        with:
             creds: ${{ secrets.AZURE_CREDENTIALS }}
       - name: 'create resourceGroup'
         if: ${{ github.event.inputs.TFACTION == 'create' }}
