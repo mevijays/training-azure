@@ -39,7 +39,7 @@ jobs:
   vmdestroy:
     runs-on: ubuntu-latest
     if: ${{ github.event.inputs.TFACTION == 'destroy' }}
-    name: 'labvmrg'
+    name: 'labdestroy'
     env:
       ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
@@ -52,5 +52,7 @@ jobs:
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.2.5
+      - name: Terraform Init
+        run: terraform -chdir=terraform/lab-rgvnet init
       - name: Terraform destroy
         run: terraform -chdir=terraform/lab-rgvnet destroy -auto-approve -input=false
