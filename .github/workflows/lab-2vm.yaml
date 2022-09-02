@@ -36,8 +36,6 @@ jobs:
 
       - name: Terraform Apply
         run: terraform -chdir=terraform/lab-rgvnet apply -auto-approve -input=false
-
-jobs:
   vmdestroy:
     runs-on: ubuntu-latest
     if: ${{ github.event.inputs.TFACTION == 'destroy' }}
