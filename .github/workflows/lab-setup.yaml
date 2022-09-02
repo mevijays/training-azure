@@ -25,4 +25,6 @@ jobs:
            az storage container create -n tfstate  --account-name krlabtfstate -g krlabdemo
       - name: 'destroy resourceGroup'
         if: ${{ github.event.inputs.TFACTION == 'destroy' }}
-        run: az group delete -g krlabdemo -y
+        run: |- 
+          az group delete -g krlabdemo -y
+          az group delete -g krlab -y
