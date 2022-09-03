@@ -28,31 +28,11 @@ jobs:
           terraform_version: 1.2.5
       # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
       - name: Terraform Init
-        run: terraform -chdir=terraform/lab-rgvnet init
+        run: terraform -chdir=terraform/rgvnetvm init
 
     # Generates an execution plan for Terraform
       - name: Terraform Plan
-        run: terraform -chdir=terraform/lab-rgvnet plan -input=false
+        run: terraform -chdir=terraform/rgvnetvm plan -input=false
 
       - name: Terraform Apply
-        run: terraform -chdir=terraform/lab-rgvnet apply -auto-approve -input=false
-  vmdestroy:
-    runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.TFACTION == 'destroy' }}
-    name: 'labdestroy'
-    env:
-      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-      ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-      ARM_SUBSCRIPTION_ID: ${{ secrets.MVP_SUBSCRIPTION }}
-      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: 1.2.5
-      - name: Terraform Init
-        run: terraform -chdir=terraform/lab-rgvnet init
-      - name: Terraform destroy
-        run: terraform -chdir=terraform/lab-rgvnet destroy -auto-approve -input=false
+        run: terraform -chdir=terraform/rgvnetvm apply -auto-approve -input=false
