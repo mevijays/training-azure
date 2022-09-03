@@ -112,7 +112,7 @@ resource "azurerm_subnet" "prodsubnet" {
 }
 
 resource "azurerm_network_interface" "webvm" {
-  count               = 1
+  count               = 2
   name                = "webvm${count.index}-nic"
   location            = azurerm_resource_group.krlabrg.location
   resource_group_name = azurerm_resource_group.krlabrg.name
@@ -130,7 +130,7 @@ resource "azurerm_network_interface" "webvm" {
 }
 
 resource "azurerm_linux_virtual_machine" "webvm" {
-  count               = 1
+  count               = 2
   name                = "webvm-${count.index}"
   resource_group_name = azurerm_resource_group.krlabrg.name
   location            = azurerm_resource_group.krlabrg.location
