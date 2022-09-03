@@ -1,16 +1,22 @@
+
 terraform {
   required_providers {
     azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "=2.46.0"
+        source  = "hashicorp/azurerm"
+        version = "=3.0.0"
     }
   }
+  backend "azurerm" {
+    resource_group_name     = "krlabdemo"
+    storage_account_name    = "krlabtfstate"
+    container_name          = "tfstate"
+    key                     = "lab.terraform.tfstate"
+  }
 }
-
-# Configure the Microsoft Azure Provider
 provider "azurerm" {
   features {}
 }
+
 
 # Create a resource group
 resource "azurerm_resource_group" "krlabrg" {
@@ -141,11 +147,11 @@ resource "azurerm_linux_virtual_machine" "webvm" {
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
   }
-
+  custom_data    = base64encode(data.template_file.linux-vm-cloud-init.rendered)
   source_image_reference {
-    publisher = "Canonical"
-    offer     = "0001-com-ubuntu-server-focal"
-    sku       = "20_04-lts-gen2"
+    publisher = "OpenLogic"
+    offer     = "CentOS"
+    sku       = "7_9"
     version   = "latest"
   }
   depends_on          = [
@@ -153,4 +159,6 @@ resource "azurerm_linux_virtual_machine" "webvm" {
         azurerm_network_interface.webvm
  ]
 }
-
+  data "template_file" "linux-vm-cloud-init" {
+  template = file("azure-user-data.sh")
+  }
