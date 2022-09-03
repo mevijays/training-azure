@@ -76,7 +76,7 @@ resource "azurerm_subnet_network_security_group_association" "vmnetnsg" {
 }
 ### creating public ips
 resource "azurerm_public_ip" "eip" {
-  count               = 1
+  count               = 2
   name                = "webvmip-${count.index}"
   resource_group_name = azurerm_resource_group.krlabrg.name
   location            = azurerm_resource_group.krlabrg.location
