@@ -11,7 +11,7 @@ on:
          - "destroy"
 jobs:
   labsetup:
-    runs-on: ubuntu-latest
+    runs-on: mylab
     steps:
       - name: 'Login via Azure CLI'
         uses: azure/login@v1
