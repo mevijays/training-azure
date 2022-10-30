@@ -11,7 +11,7 @@ on:
          - "destroy" 
 jobs:
   vmsetup:
-    runs-on: mylab
+    runs-on: ubuntu-latest
     if: ${{ github.event.inputs.TFACTION == 'create' }}
     name: 'labsetup'
     env:
