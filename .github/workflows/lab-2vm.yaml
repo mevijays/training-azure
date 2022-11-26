@@ -9,13 +9,21 @@ on:
         options:
          - "apply"
          - "destroy"
+permissions:
+  contents: 'read'
+  id-token: 'write'
 env:
   TF_HTTP_USERNAME: '${{ secrets.GITLAB_USER }}'
   TF_HTTP_ADDRESS: '${{ secrets.GITLAB_URL }}/azurevm'
   TF_HTTP_PASSWORD: '${{ secrets.GITLAB_TOKEN }}'
+  
 jobs:
   vmsetup:
     runs-on: ubuntu-latest
+ # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
     name: 'labsetup'
     env:
       ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
@@ -41,8 +49,8 @@ jobs:
 
       - name: Terraform Apply
         if: ${{ github.event.inputs.TFACTION == 'apply' }}
-        run: terraform  apply -auto-approve -input=false
+        run: terraform  apply --auto-approve -input=false
         working-directory: terraform/rgvnetvm
       - name: Terraform Destroy
         if: ${{ github.event.inputs.TFACTION == 'destroy' }}
-        run: terraform destroy -auto-approve -input=false
+        run: terraform destroy --auto-approve -input=false
