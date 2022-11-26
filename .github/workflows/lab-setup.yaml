@@ -42,10 +42,10 @@ jobs:
           az group delete -g krlabdemo -y
           az group delete -g krlab -y
   
-  2-vmlab-setup:
+  vmlab-setup:
     if: ${{ github.event.inputs.LABTYPE == '2vm-lab' }}
     uses: ./.github/workflows/lab-2vm.yaml
-  Peering-lab-setup:
+  peering-lab-setup:
     if: ${{ github.event.inputs.LABTYPE == 'peering-lab' }}
     uses: ./.github/workflows/lab-vnet-peering.yaml
      
