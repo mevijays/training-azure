@@ -12,7 +12,6 @@ on:
 jobs:
   vmsetup:
     runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.TFACTION == 'create' }}
     name: 'labsetup'
     env:
       ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
@@ -28,11 +27,17 @@ jobs:
           terraform_version: 1.2.5
       # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
       - name: Terraform Init
+        if: ${{ github.event.inputs.TFACTION == 'create' }}
         run: terraform -chdir=terraform/rgvnetvm init
 
     # Generates an execution plan for Terraform
       - name: Terraform Plan
+        if: ${{ github.event.inputs.TFACTION == 'create' }}
         run: terraform -chdir=terraform/rgvnetvm plan -input=false
 
       - name: Terraform Apply
+        if: ${{ github.event.inputs.TFACTION == 'create' }}
         run: terraform -chdir=terraform/rgvnetvm apply -auto-approve -input=false
+      - name: Terraform destroy
+        if: ${{ github.event.inputs.TFACTION == 'destroy' }}
+        run: terraform -chdir=terraform/rgvnetvm destroy -auto-approve -input=false
