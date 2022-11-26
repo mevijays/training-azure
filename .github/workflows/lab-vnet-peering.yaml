@@ -1,0 +1,38 @@
+name: setup vnet peering lab
+on:
+  workflow_dispatch:
+     inputs:
+      TFACTION:
+        default: "create"
+        required: true
+        type: choice
+        options:
+         - "create"
+         - "destroy" 
+jobs:
+  peeringsetup:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.TFACTION == 'create' }}
+    name: 'labsetup'
+    env:
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.2.5
+      # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+      - name: Terraform Init
+        run: terraform -chdir=terraform/vnetpeer init
+
+    # Generates an execution plan for Terraform
+      - name: Terraform Plan
+        run: terraform -chdir=terraform/vnetpeer plan -input=false
+
+      - name: Terraform Apply
+        run: terraform -chdir=terraform/vnetpeer apply -auto-approve -input=false
