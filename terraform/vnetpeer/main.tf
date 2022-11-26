@@ -39,7 +39,7 @@ resource "azurerm_virtual_network" "devvnet" {
 resource "azurerm_subnet" "devsubnet" {
   name                 = "devsubnet"
   resource_group_name  = azurerm_resource_group.krlabrg.name
-  virtual_network_name = azurerm_virtual_network.labvnet.name
+  virtual_network_name = azurerm_virtual_network.devvnet.name
   address_prefixes     = ["192.168.1.0/25"]
   depends_on          = [
     azurerm_resource_group.krlabrg,
