@@ -123,7 +123,7 @@ resource "azurerm_network_security_group" "prodvmnsg" {
 }
 
 // associate NSG with vm subnet
-resource "azurerm_subnet_network_security_group_association" "vmnetnsg" {
+resource "azurerm_subnet_network_security_group_association" "devvmnetnsg" {
   subnet_id                 = azurerm_subnet.prodsubnet.id
   network_security_group_id = azurerm_network_security_group.prodvmnsg.id
 }
