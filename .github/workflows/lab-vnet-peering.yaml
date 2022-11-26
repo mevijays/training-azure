@@ -1,14 +1,6 @@
 name: setup vnet peering lab
 on:
-  workflow_dispatch:
-     inputs:
-      TFACTION:
-        default: "create"
-        required: true
-        type: choice
-        options:
-         - "create"
-         - "destroy" 
+  workflow_call
 jobs:
   peeringsetup:
     runs-on: ubuntu-latest

@@ -1,6 +1,6 @@
 name: setup vm lab
 on:
-  workflow_dispatch:
+  workflow_call
 jobs:
   vmsetup:
     runs-on: ubuntu-latest
