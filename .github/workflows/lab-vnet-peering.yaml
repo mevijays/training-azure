@@ -47,3 +47,4 @@ jobs:
       - name: Terraform Destroy
         if: ${{ github.event.inputs.TFACTION == 'destroy' }}
         run: terraform destroy -auto-approve -input=false
+        working-directory: terraform/vnetpeer
