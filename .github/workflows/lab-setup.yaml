@@ -9,6 +9,13 @@ on:
         options:
          - "create"
          - "destroy"
+      LABTYPE:
+        default: "2vm-lab"
+        required: true
+        type: choice
+        options:
+          - "2vm-lab"
+          - "peering-lab"
 permissions:
       id-token: write
       contents: read
@@ -33,3 +40,11 @@ jobs:
         run: |- 
           az group delete -g krlabdemo -y
           az group delete -g krlab -y
+  
+  2-vmlab-setup:
+    if: ${{ github.event.inputs.LABTYPE == '2vm-lab' }}
+    uses: ./.github/workflows/lab-2vm.yaml
+  Peering-lab-setup:
+    if: ${{ github.event.inputs.LABTYPE == 'peering-lab' }}
+    uses: ./.github/workflows/lab-vnet-peering.yaml
+     
