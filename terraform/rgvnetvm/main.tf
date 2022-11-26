@@ -6,12 +6,7 @@ terraform {
         version = "=3.0.0"
     }
   }
-  backend "azurerm" {
-    resource_group_name     = "krlabdemo"
-    storage_account_name    = "krlabtfstate"
-    container_name          = "tfstate"
-    key                     = "lab.terraform.tfstate"
-  }
+  backend "http" {}
 }
 provider "azurerm" {
   features {}
