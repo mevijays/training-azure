@@ -16,6 +16,7 @@ on:
         options:
           - "2vm-lab"
           - "peering-lab"
+          - "none"
 permissions:
       id-token: write
       contents: read
