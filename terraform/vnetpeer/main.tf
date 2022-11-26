@@ -191,9 +191,10 @@ resource "azurerm_linux_virtual_machine" "devvm" {
         azurerm_network_interface.devvm
  ]
 }
-  data "template_file" "linux-vm-cloud-init" {
-  template = file("azure-user-data.sh")
-  }
+
+data "template_file" "linux-vm-cloud-init" {
+   template = file("azure-user-data.sh")
+}
 
 
 // setup prod vm
@@ -261,6 +262,3 @@ resource "azurerm_linux_virtual_machine" "prodvm" {
         azurerm_network_interface.prodvm
  ]
 }
-  data "template_file" "linux-vm-cloud-init" {
-  template = file("azure-user-data.sh")
-  }
