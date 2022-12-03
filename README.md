@@ -1,3 +1,5 @@
+https://img.shields.io/github/languages/top/mevijays/training-azure
+
 # Azure courses
 
 ## Introduction of cloud and Azure cloud
