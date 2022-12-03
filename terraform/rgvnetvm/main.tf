@@ -12,7 +12,10 @@ provider "azurerm" {
   features {}
 }
 
-
+variable "VMCOUNT" {
+  default  = 2
+  type     = number
+}
 # Create a resource group
 resource "azurerm_resource_group" "krlabrg" {
   name     = "krlab"
@@ -71,7 +74,7 @@ resource "azurerm_subnet_network_security_group_association" "vmnetnsg" {
 }
 ### creating public ips
 resource "azurerm_public_ip" "eip" {
-  count               = 2
+  count               = var.VMCOUNT
   name                = "webvmip-${count.index}"
   resource_group_name = azurerm_resource_group.krlabrg.name
   location            = azurerm_resource_group.krlabrg.location
@@ -107,7 +110,7 @@ resource "azurerm_subnet" "prodsubnet" {
 }
 
 resource "azurerm_network_interface" "webvm" {
-  count               = 2
+  count               = var.VMCOUNT
   name                = "webvm${count.index}-nic"
   location            = azurerm_resource_group.krlabrg.location
   resource_group_name = azurerm_resource_group.krlabrg.name
@@ -125,7 +128,7 @@ resource "azurerm_network_interface" "webvm" {
 }
 
 resource "azurerm_linux_virtual_machine" "webvm" {
-  count               = 2
+  count               = var.VMCOUNT
   name                = "webvm-${count.index}"
   resource_group_name = azurerm_resource_group.krlabrg.name
   location            = azurerm_resource_group.krlabrg.location
