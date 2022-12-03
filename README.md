@@ -1,4 +1,4 @@
-https://img.shields.io/github/languages/top/mevijays/training-azure
+![GitHub top language](https://img.shields.io/github/languages/top/mevijays/training-azure)
 
 # Azure courses
 
