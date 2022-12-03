@@ -9,6 +9,11 @@ on:
         options:
          - "apply"
          - "destroy"
+      VMCOUNT:
+         default: "2"
+         required: true
+         type: text
+         
 permissions:
   contents: 'read'
   id-token: 'write'
@@ -16,6 +21,7 @@ env:
   TF_HTTP_USERNAME: '${{ secrets.GITLAB_USER }}'
   TF_HTTP_ADDRESS: '${{ secrets.GITLAB_URL }}/azurevm'
   TF_HTTP_PASSWORD: '${{ secrets.GITLAB_TOKEN }}'
+  TF_VAR_VMCOUNT: '${{ github.event.inputs.VMCOUNT }}'
   
 jobs:
   vmsetup:
