@@ -15,9 +15,8 @@ permissions:
   id-token: 'write'
 env:
   TF_HTTP_USERNAME: '${{ secrets.GITLAB_USER }}'
-  TF_HTTP_ADDRESS: '${{ secrets.GITLAB_URL }}/azurevm'
+  TF_HTTP_ADDRESS: '${{ secrets.GITLAB_URL }}/gitproj'
   TF_HTTP_PASSWORD: '${{ secrets.GITLAB_TOKEN }}'
-  TF_VAR_VMCOUNT: '${{ github.event.inputs.VMCOUNT }}'
   
 jobs:
   repo_create:
