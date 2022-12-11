@@ -1,0 +1,55 @@
+name: github repo create
+on:
+  workflow_dispatch:
+    inputs:
+      TFACTION:
+        default: "apply"
+        required: true
+        type: choice
+        options:
+         - "apply"
+         - "destroy"
+         
+permissions:
+  contents: 'read'
+  id-token: 'write'
+env:
+  TF_HTTP_USERNAME: '${{ secrets.GITLAB_USER }}'
+  TF_HTTP_ADDRESS: '${{ secrets.GITLAB_URL }}/azurevm'
+  TF_HTTP_PASSWORD: '${{ secrets.GITLAB_TOKEN }}'
+  TF_VAR_VMCOUNT: '${{ github.event.inputs.VMCOUNT }}'
+  
+jobs:
+  repo_create:
+    runs-on: ubuntu-latest
+ # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+    name: 'setup repo'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.2.5
+      # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+      - name: Terraform Init
+        run: terraform  init
+        working-directory: terraform/github
+
+    # Generates an execution plan for Terraform
+      - name: Terraform Plan
+        run: terraform  plan -input=false
+        working-directory: terraform/github
+
+      - name: Terraform Apply
+        if: ${{ github.event.inputs.TFACTION == 'apply' }}
+        run: terraform  apply --auto-approve -input=false
+        working-directory: terraform/github
+      - name: Terraform Destroy
+        if: ${{ github.event.inputs.TFACTION == 'destroy' }}
+        run: terraform destroy --auto-approve -input=false
+        working-directory: terraform/github
