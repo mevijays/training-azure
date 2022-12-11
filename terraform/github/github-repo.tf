@@ -9,8 +9,6 @@ terraform {
 }
 variable "TOKEN" {}
 provider "github" {
-  # Configuration options
-  owner  = "mevijays"
   token  = var.TOKEN
 }
 
