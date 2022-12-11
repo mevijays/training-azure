@@ -11,6 +11,7 @@ terraform {
 provider "github" {
   # Configuration options
   owner  = "mevijays"
+  token  = var.TOKEN
 }
 
 resource "github_repository" "example" {
