@@ -9,9 +9,9 @@ on:
         options:
          - "apply"
          - "destroy"
-         
+       
 permissions:
-  contents: 'read'
+  contents: 'write'
   id-token: 'write'
 env:
   TF_HTTP_USERNAME: '${{ secrets.GITLAB_USER }}'
