@@ -7,7 +7,7 @@ terraform {
   }
   backend "http" {}
 }
-
+"TOKEN" {}
 provider "github" {
   # Configuration options
   owner  = "mevijays"
