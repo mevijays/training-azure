@@ -10,6 +10,7 @@ terraform {
 
 provider "github" {
   # Configuration options
+  owner  = "mevijays"
 }
 
 resource "github_repository" "example" {
