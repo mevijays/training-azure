@@ -10,7 +10,7 @@ on:
          - "apply"
          - "destroy"
 permissions:
-  actions: write-all
+  actions: write
   contents: write
   security-events: write       
   repository-projects: write
