@@ -14,7 +14,6 @@ env:
   TF_HTTP_USERNAME: '${{ secrets.GITLAB_USER }}'
   TF_HTTP_ADDRESS: '${{ secrets.GITLAB_URL }}/gitproj'
   TF_HTTP_PASSWORD: '${{ secrets.GITLAB_TOKEN }}'
-  TF_VAR_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
   GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
 
   
@@ -30,6 +29,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: env print
+        run: env
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
