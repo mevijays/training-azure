@@ -7,7 +7,6 @@ terraform {
   }
   backend "http" {}
 }
-variable "TOKEN" {}
 
 provider "github" {}
 
