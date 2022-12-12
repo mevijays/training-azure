@@ -8,9 +8,8 @@ terraform {
   backend "http" {}
 }
 variable "TOKEN" {}
-provider "github" {
-  token  = var.TOKEN
-}
+
+provider "github" {}
 
 resource "github_repository" "example" {
   name        = "example"
