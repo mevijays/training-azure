@@ -10,9 +10,6 @@ on:
          - "apply"
          - "destroy"
        
-permissions:
-  contents: 'write'
-  id-token: 'write'
 env:
   TF_HTTP_USERNAME: '${{ secrets.GITLAB_USER }}'
   TF_HTTP_ADDRESS: '${{ secrets.GITLAB_URL }}/gitproj'
