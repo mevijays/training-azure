@@ -10,9 +10,7 @@ on:
          - "apply"
          - "destroy"
 permissions:
-  actions: write
-  contents: write
-  security-events: write       
+  id-token: write    
   repository-projects: write
 env:
   TF_HTTP_USERNAME: '${{ secrets.GITLAB_USER }}'
