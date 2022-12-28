@@ -25,7 +25,7 @@ env:
   
 jobs:
   vmsetup:
-    runs-on: k8s-runner
+    runs-on: mylab-docker
  # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
       run:
