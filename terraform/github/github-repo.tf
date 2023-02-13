@@ -8,7 +8,12 @@ terraform {
   backend "http" {}
 }
 
-provider "github" {}
+provider "github" {
+ token  = var.gtoken
+ owner  = "mevijays"
+}
+
+}
 
 resource "github_repository" "example" {
   name        = "example"
