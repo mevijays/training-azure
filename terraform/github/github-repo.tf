@@ -13,7 +13,7 @@ provider "github" {
  owner  = "mevijays"
 }
 
-}
+
 
 resource "github_repository" "example" {
   name        = "example"
