@@ -1,8 +1,0 @@
-
-name: "branch check"
-on:
-  pull_request:
-    branches: [ "main", "develop" ]
-jobs:
-  call-workflow:
-    uses: mevijays/actions-utils/.github/workflows/branchprotect.yaml@main
