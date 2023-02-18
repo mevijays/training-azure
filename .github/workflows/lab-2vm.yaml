@@ -30,6 +30,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - uses: elstudio/action-install-azure-cli@v1
       - name: 'Az CLI login'
         uses: azure/login@v1
         with:
