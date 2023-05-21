@@ -1,0 +1,53 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {},
+    "variables": {
+        "prodvnetPrefix": "192.168.1.0/24",
+        "prodvnetSubnet1Name": "devsubnet1",
+        "prodvnetSubnet1Prefix": "192.168.1.0/26",
+        "prodvnetSubnet2Name": "Subnet-2",
+        "prodvnetSubnet2Prefix": "192.168.1.64/26",
+        "prodvnetSubnet3Name": "Subnet-3",
+        "prodvnetSubnet3Prefix": "192.168.1.128/26"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2015-06-15",
+            "name": "prodvnet",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [],
+            "tags": {
+                "displayName": "prodvnet"
+            },
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('prodvnetPrefix')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('prodvnetSubnet1Name')]",
+                        "properties": {
+                            "addressPrefix": "[variables('prodvnetSubnet1Prefix')]"
+                        }
+                    },
+                    {
+                        "name": "[variables('prodvnetSubnet3Name')]",
+                        "properties": {
+                            "addressPrefix": "[variables('prodvnetSubnet3Prefix')]"
+                        }
+                    },
+                    {
+                        "name": "[variables('prodvnetSubnet2Name')]",
+                        "properties": {
+                            "addressPrefix": "[variables('prodvnetSubnet2Prefix')]"
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}
