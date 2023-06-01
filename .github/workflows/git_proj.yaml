@@ -22,6 +22,8 @@ env:
 jobs:
   repo_create:
     runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
  # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
       run:
@@ -31,34 +33,29 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        
       - name: env print
         run: env
+        
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
-          terraform_version: 1.2.5
-      # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+          terraform_version: 1.4.6
+
       - name: Terraform Init
         run: terraform  init
         working-directory: terraform/github
 
-    # Generates an execution plan for Terraform
       - name: Terraform Plan
-        run: terraform  plan -input=false
+        run: terraform  plan 
         working-directory: terraform/github
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Terraform Apply
         if: ${{ github.event.inputs.TFACTION == 'apply' }}
-        run: terraform  apply --auto-approve -input=false
+        run: terraform  apply --auto-approve 
         working-directory: terraform/github
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Terraform Destroy
         if: ${{ github.event.inputs.TFACTION == 'destroy' }}
-        run: terraform destroy --auto-approve -input=false
+        run: terraform destroy --auto-approve
         working-directory: terraform/github
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
