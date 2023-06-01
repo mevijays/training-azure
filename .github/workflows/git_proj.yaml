@@ -18,8 +18,6 @@ env:
   TF_HTTP_USERNAME: '${{ secrets.GITLAB_USER }}'
   TF_HTTP_ADDRESS: '${{ secrets.GITLAB_URL }}/gitproj'
   TF_HTTP_PASSWORD: '${{ secrets.GITLAB_TOKEN }}'
-  TF_VAR_gtoken: '${{ secrets.GTOKEN }}'
-
   
 jobs:
   repo_create:
@@ -48,12 +46,19 @@ jobs:
       - name: Terraform Plan
         run: terraform  plan -input=false
         working-directory: terraform/github
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Terraform Apply
         if: ${{ github.event.inputs.TFACTION == 'apply' }}
         run: terraform  apply --auto-approve -input=false
         working-directory: terraform/github
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Terraform Destroy
         if: ${{ github.event.inputs.TFACTION == 'destroy' }}
         run: terraform destroy --auto-approve -input=false
         working-directory: terraform/github
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
