@@ -9,11 +9,11 @@ terraform {
 }
 
 provider "github" {
- token  = var.GITHUB_TOKEN
+ token  = var.G_TOKEN
  owner  = "mevijays"
 }
 
-variable "GITHUB_TOKEN" {
+variable "G_TOKEN" {
   type = string
 }
 
