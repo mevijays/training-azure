@@ -9,11 +9,6 @@ on:
         options:
          - "apply"
          - "destroy"
-permissions:
-  id-token: write  
-  contents: write
-  actions: write
-  repository-projects: write
 env:
   TF_HTTP_USERNAME: '${{ secrets.GITLAB_USER }}'
   TF_HTTP_ADDRESS: '${{ secrets.GITLAB_URL }}/gitproj'
@@ -21,10 +16,11 @@ env:
   
 jobs:
   repo_create:
-    runs-on: ubuntu-latest
+    runs-on: mylab-vm
+    permissions: write-all
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
- # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+      TF_VAR_G_TOKEN: ${{ secrets.G_TOKEN }}
+
     defaults:
       run:
         shell: bash
