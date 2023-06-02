@@ -19,7 +19,9 @@ variable "G_TOKEN" {
 
 
 resource "github_repository" "example" {
-  name        = "example"
+  count = length(var.repos)
+  for_each = toset(var.repos)
+  name        = each.key
   description = "My awesome codebase"
   visibility  = "public"
   auto_init   = true
