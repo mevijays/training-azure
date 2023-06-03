@@ -1,1 +1,7 @@
-repos = ["repo1", "repo2", "repo3", "repo4"]
+repos = 
+[
+    "repo1",
+    "repo2",
+    "repo3",
+    "repo4"
+]
