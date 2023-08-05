@@ -6,7 +6,13 @@ terraform {
         version = "=3.0.0"
     }
   }
-  backend "http" {}
+   cloud {
+    organization = "mevijays"
+
+    workspaces {
+      name = "training-azure"
+    }
+  }
 }
 provider "azurerm" {
   features {}
