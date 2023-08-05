@@ -12,6 +12,7 @@ terraform {
     workspaces {
       name = "training-azure"
     }
+  }
 }
 provider "azurerm" {
   features {}
