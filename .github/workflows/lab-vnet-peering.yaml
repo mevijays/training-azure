@@ -10,9 +10,10 @@ on:
          - "apply"
          - "destroy"
 env:
-  TF_HTTP_USERNAME: '${{ secrets.GITLAB_USER }}'
-  TF_HTTP_ADDRESS: '${{ secrets.GITLAB_URL }}/azurepeer'
-  TF_HTTP_PASSWORD: '${{ secrets.GITLAB_TOKEN }}'
+  TF_CLOUD_ORGANIZATION: "mevijays"
+  TF_API_TOKEN: "${{ secrets.TF_API_TOKEN }}"
+  TF_WORKSPACE: "training-azure"
+  CONFIG_DIRECTORY: "./"
 
 jobs:
   peeringsetup:
