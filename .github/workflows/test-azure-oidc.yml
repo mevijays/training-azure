@@ -8,7 +8,7 @@ permissions:
       contents: read
 jobs: 
   build-and-deploy:
-    runs-on: ubuntu-latest
+    runs-on: mylab-vm
     steps:
       - name: Az CLI login
         uses: azure/login@v1
