@@ -96,7 +96,7 @@
 - Migration of local disk to azure as vm
 
 ## Azure IAM
-- Azure AD intro
+- Microsoft Entra ID
 - Concept of tenent 
 - Authentication (users, guest users & groups)
 - Authorization (roles and policies)
@@ -110,12 +110,15 @@
 
 
 
-## [Lab guide for AZ-900](https://mevijays.github.io/AZ-900T0x-MicrosoftAzureFundamentals/)
+## [Lab guide for AZ-900](https://microsoftlearning.github.io/AI-900-AIFundamentals/)
 
 
-## [Lab guide for AZ-104](https://mevijays.github.io/AZ-104-MicrosoftAzureAdministrator)
+## [Lab guide for AZ-104](https://microsoftlearning.github.io/AZ-104-MicrosoftAzureAdministrator/)
 
 
-## [Lab guide for AZ-305](https://mevijays.github.io/AZ-305-DesigningMicrosoftAzureInfrastructureSolutions)
+## [Lab guide for AZ-305](https://microsoftlearning.github.io/AZ-305-DesigningMicrosoftAzureInfrastructureSolutions/)
+
+
+## [Lab guide for AZ-400](https://microsoftlearning.github.io/AZ400-DesigningandImplementingMicrosoftDevOpsSolutions/)
 
 
