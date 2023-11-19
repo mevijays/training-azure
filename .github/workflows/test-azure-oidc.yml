@@ -1,7 +1,7 @@
 # File: .github/workflows/OIDC_workflow.yml
 
 name: Run Azure Login with OIDC
-on: [push]
+on: workflow_dispatch
 
 permissions:
       id-token: write
