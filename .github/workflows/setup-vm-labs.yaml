@@ -3,6 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       TFACTION:
+        description: "Terraform Action"
         default: "apply"
         required: true
         type: choice
@@ -10,6 +11,7 @@ on:
          - "apply"
          - "destroy"
       VMCOUNT:
+         description: "Virtual Machine counts"
          default: "2"
          required: true
          type: text
