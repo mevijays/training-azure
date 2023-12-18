@@ -1,4 +1,4 @@
-![GitHub top language](https://img.shields.io/github/languages/top/mevijays/training-azure)   [![setup vm lab](https://github.com/mevijays/training-azure/actions/workflows/lab-2vm.yaml/badge.svg)](https://github.com/mevijays/training-azure/actions/workflows/lab-2vm.yaml)
+![GitHub top language](https://img.shields.io/github/languages/top/mevijays/training-azure)   [![Setup vm lab](https://github.com/mevijays/training-azure/actions/workflows/setup-vm-labs.yaml/badge.svg?branch=main)](https://github.com/mevijays/training-azure/actions/workflows/setup-vm-labs.yaml)
 
 # Azure courses
 
