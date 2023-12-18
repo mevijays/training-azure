@@ -38,4 +38,5 @@ resource "github_branch_protection_v3" "main" {
     require_code_owner_reviews = true
     required_approving_review_count = 1
   }
+  depends_on = [ github_repository.main ]
 }
