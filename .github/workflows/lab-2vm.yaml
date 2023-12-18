@@ -1,4 +1,4 @@
-name: setup vm lab
+name: Setup vm lab
 on:
   workflow_dispatch:
     inputs:
@@ -13,6 +13,9 @@ on:
          default: "2"
          required: true
          type: text
+      PUBLIC:
+         type: boolean
+         default: true
          
 permissions:
   contents: 'read'
