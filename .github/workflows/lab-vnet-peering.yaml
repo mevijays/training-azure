@@ -1,4 +1,4 @@
-name: "Setup vm lab"
+name: "VNET peering Lab"
 on:
   workflow_dispatch:
     inputs:
