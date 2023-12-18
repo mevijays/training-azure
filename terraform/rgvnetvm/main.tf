@@ -24,128 +24,110 @@ provider "azurerm" {
 }
 
 variable "VMCOUNT" {
-  default  = 2
-  type     = number
+  description = "Number of VMs to create"
+  type        = number
+  default     = 1
 }
-# Create a resource group
-resource "azurerm_resource_group" "krlabrg" {
-  name     = "krlab"
+variable "PUBLIC" {
+  description = "If publc ip required"
+  type = bool
+  default = true
+}
+
+locals {
+  PORTS = [
+    {
+      priority = 100
+      name = "HTTP"
+      port = 80
+    },
+    {
+      priority = 101
+      name = "HTTPS"
+      port = 443
+    },
+    {
+      priority = 102
+      name = "SSH"
+      port = 22
+    }
+  ]
+}
+
+resource "azurerm_resource_group" "main" {
+  name     = "krlabrg"
   location = "eastus"
 }
 
-# Create a virtual network within the resource group
-resource "azurerm_virtual_network" "labvnet" {
-  name                = "labvnet"
-  resource_group_name = azurerm_resource_group.krlabrg.name
-  location            = azurerm_resource_group.krlabrg.location
+resource "azurerm_virtual_network" "main" {
+  name                = "devvnet"
   address_space       = ["10.0.0.0/16"]
-  depends_on          = [
-    azurerm_resource_group.krlabrg,
-  ]
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
 }
 
-# Create a vm subnet 
-resource "azurerm_subnet" "vmsubnet" {
-  name                 = "vmsubnet"
-  resource_group_name  = azurerm_resource_group.krlabrg.name
-  virtual_network_name = azurerm_virtual_network.labvnet.name
-  address_prefixes     = ["10.0.1.0/24"]
-  depends_on          = [
-    azurerm_resource_group.krlabrg,
-    azurerm_virtual_network.labvnet
-  ]
+resource "azurerm_subnet" "main" {
+  count                = 3
+  name                 = "devsubnet-${count.index}"
+  resource_group_name  = azurerm_resource_group.main.name
+  virtual_network_name = azurerm_virtual_network.main.name
+  address_prefixes     = ["10.0.${count.index}.0/24"]
 }
 
-## creating NSG with all inbound allow
-resource "azurerm_network_security_group" "vmnsg" {
-  name                = "vmnsg"
-  location            = azurerm_resource_group.krlabrg.location
-  resource_group_name = azurerm_resource_group.krlabrg.name
 
-  security_rule {
-    name                       = "allallow"
-    priority                   = 100
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "*"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-
-  tags = {
-    environment = "Production"
+resource "azurerm_network_security_group" "main" {
+  name                = "main-nsg"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  dynamic "security_rule" {
+    for_each = local.PORTS
+    content {
+      name                       = security_rule.value.name
+      priority                   = security_rule.value.priority
+      direction                  = "Inbound"
+      access                     = "Allow"
+      protocol                   = "Tcp"
+      destination_port_range     = security_rule.value.port
+      source_port_range          = "*"
+      source_address_prefix      = "*"
+      destination_address_prefix = "*"
+    }
   }
 }
-## associate NSG with vm subnet
-resource "azurerm_subnet_network_security_group_association" "vmnetnsg" {
-  subnet_id                 = azurerm_subnet.vmsubnet.id
-  network_security_group_id = azurerm_network_security_group.vmnsg.id
+resource "azurerm_subnet_network_security_group_association" "this" {
+  count = length(azurerm_subnet.main[*].id)
+  subnet_id                 = azurerm_subnet.main[count.index].id
+  network_security_group_id = azurerm_network_security_group.main.id
 }
-### creating public ips
-resource "azurerm_public_ip" "eip" {
-  count               = var.VMCOUNT
+resource "azurerm_public_ip" "this" {
+  count               = var.PUBLIC ? var.VMCOUNT : 0
   name                = "webvmip-${count.index}"
-  resource_group_name = azurerm_resource_group.krlabrg.name
-  location            = azurerm_resource_group.krlabrg.location
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
   allocation_method   = "Static"
-
-  tags = {
-    environment = "Production"
-  }
 }
-
-
-# Create a dev subnet 
-resource "azurerm_subnet" "devsubnet" {
-  name                 = "devsubnet"
-  resource_group_name  = azurerm_resource_group.krlabrg.name
-  virtual_network_name = azurerm_virtual_network.labvnet.name
-  address_prefixes     = ["10.0.2.0/24"]
-  depends_on          = [
-    azurerm_resource_group.krlabrg,
-    azurerm_virtual_network.labvnet
-  ]
-}
-# Create a prod vm subnet 
-resource "azurerm_subnet" "prodsubnet" {
-  name                 = "prodsubnet"
-  resource_group_name  = azurerm_resource_group.krlabrg.name
-  virtual_network_name = azurerm_virtual_network.labvnet.name
-  address_prefixes     = ["10.0.3.0/24"]
-  depends_on          = [
-    azurerm_resource_group.krlabrg,
-    azurerm_virtual_network.labvnet
-  ]
-}
-
-resource "azurerm_network_interface" "webvm" {
+resource "azurerm_network_interface" "main" {
   count               = var.VMCOUNT
-  name                = "webvm${count.index}-nic"
-  location            = azurerm_resource_group.krlabrg.location
-  resource_group_name = azurerm_resource_group.krlabrg.name
+  name                = "main-nic-${count.index}"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
 
   ip_configuration {
-    name                          = "internal"
-    subnet_id                     = azurerm_subnet.vmsubnet.id
+    name                          = "main-ipconfig"
+    subnet_id                     = azurerm_subnet.main[count.index].id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = element(azurerm_public_ip.eip.*.id, count.index) 
+    public_ip_address_id          = var.PUBLIC ? azurerm_public_ip.this[count.index].id : null
   }
-  depends_on          = [
-        azurerm_subnet.vmsubnet,
-        azurerm_public_ip.eip
- ]
 }
 
 resource "azurerm_linux_virtual_machine" "webvm" {
-  count               = var.VMCOUNT
-  name                = "webvm-${count.index}"
-  resource_group_name = azurerm_resource_group.krlabrg.name
-  location            = azurerm_resource_group.krlabrg.location
-  size                = "Standard_B1s"
-  admin_username      = "vijay"
-  network_interface_ids =  [element(azurerm_network_interface.webvm.*.id, count.index)]
+  count                 = var.VMCOUNT
+  name                  = "webvm-${count.index}"
+  resource_group_name   = azurerm_resource_group.main.name
+  location              = azurerm_resource_group.main.location
+  size                  = "Standard_B1s"
+  admin_username        = "vijay"
+  network_interface_ids = [azurerm_network_interface.main[count.index].id]
 
   admin_ssh_key {
     username   = "vijay"
@@ -156,18 +138,11 @@ resource "azurerm_linux_virtual_machine" "webvm" {
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
   }
-  custom_data    = base64encode(data.template_file.linux-vm-cloud-init.rendered)
+  custom_data = filebase64("azure-user-data.sh")
   source_image_reference {
     publisher = "OpenLogic"
     offer     = "CentOS"
     sku       = "7_9"
     version   = "latest"
   }
-  depends_on          = [
-        azurerm_subnet.vmsubnet,
-        azurerm_network_interface.webvm
- ]
 }
-  data "template_file" "linux-vm-cloud-init" {
-  template = file("azure-user-data.sh")
-  }
