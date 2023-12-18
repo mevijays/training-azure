@@ -34,6 +34,17 @@ variable "PUBLIC" {
   default = true
 }
 
+variable "location" {
+  description = "RG Location"
+  type = string
+  default = "eastus"
+}
+variable "rgname" {
+  description = "RG name"
+  type = string
+  default = "krlab"
+}
+
 locals {
   PORTS = [
     {
@@ -55,8 +66,8 @@ locals {
 }
 
 resource "azurerm_resource_group" "main" {
-  name     = "krlabrg"
-  location = "eastus"
+  name     = var.rgname
+  location = var.location
 }
 
 resource "azurerm_virtual_network" "main" {
