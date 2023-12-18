@@ -28,9 +28,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         
-      - name: env print
-        run: env
-        
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
