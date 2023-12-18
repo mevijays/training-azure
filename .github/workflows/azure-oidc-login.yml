@@ -1,6 +1,6 @@
 # File: .github/workflows/OIDC_workflow.yml
 
-name: Run Azure Login with OIDC
+name: "Azure Login with OIDC"
 on: workflow_dispatch
 
 permissions:
