@@ -54,6 +54,9 @@ jobs:
         working-directory: terraform/rgvnetvm
 
       - name: Terraform Apply
+        env:
+          TF_VAR_VMCOUNT: "${{ inputs.VMCOUNT }}"
+          TF_VAR_PUBLIC: ${{ inputs.PUBLIC }}
         if: ${{ github.event.inputs.TFACTION == 'apply' }}
         run: terraform  apply --auto-approve -input=false
         working-directory: terraform/rgvnetvm
