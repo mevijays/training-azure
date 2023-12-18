@@ -1,4 +1,4 @@
-name: github repo create
+name: "GitHub repo create"
 on:
   workflow_dispatch:
     inputs:
