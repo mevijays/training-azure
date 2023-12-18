@@ -16,6 +16,13 @@ on:
       PUBLIC:
          type: boolean
          default: true
+      location:
+         type: string
+         default: "eastus"
+      rgname:
+         description: "ResourceGroup name"
+         type: string
+         default: "krlab"
          
 permissions:
   contents: 'read'
@@ -57,6 +64,8 @@ jobs:
         env:
           TF_VAR_VMCOUNT: "${{ inputs.VMCOUNT }}"
           TF_VAR_PUBLIC: ${{ inputs.PUBLIC }}
+          TF_VAR_location: ${{ inputs.location }}
+          TF_VAR_rgname: ${{ inputs.rgname }}
         if: ${{ github.event.inputs.TFACTION == 'apply' }}
         run: terraform  apply --auto-approve -input=false
         working-directory: terraform/rgvnetvm
