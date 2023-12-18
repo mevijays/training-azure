@@ -31,7 +31,8 @@ resource "github_repository" "main" {
   auto_init   = true
 }
 resource "github_branch_protection_v3" "main" {
-  repository     = github_repository.main[*].name
+  for_each = toset(var.repos)
+  repository = each.key
   branch         = "main"
   required_pull_request_reviews {
     require_code_owner_reviews = true
