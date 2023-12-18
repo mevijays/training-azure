@@ -1,4 +1,4 @@
-name: Setup vm lab
+name: "Setup vm lab"
 on:
   workflow_dispatch:
     inputs:
