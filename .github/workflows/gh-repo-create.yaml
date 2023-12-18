@@ -9,14 +9,12 @@ on:
         options:
          - "apply"
          - "destroy"
-env:
-  TF_HTTP_USERNAME: '${{ secrets.GITLAB_USER }}'
-  TF_HTTP_ADDRESS: '${{ secrets.GITLAB_URL }}/gitproj'
-  TF_HTTP_PASSWORD: '${{ secrets.GITLAB_TOKEN }}'
-  
+permissions:
+  contents: 'read'
+  id-token: 'write'
 jobs:
   repo_create:
-    runs-on: mylab-vm
+    runs-on: ubuntu-latest
     permissions: write-all
     env:
       TF_VAR_G_TOKEN: ${{ secrets.G_TOKEN }}
