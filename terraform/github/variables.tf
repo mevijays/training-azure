@@ -1,4 +1,8 @@
 variable "repos" {
   type = list
-  default = ["repo1", "repo2", "repo3", "repo4"]
+  default = ["repo1", "repo2"]
+}
+variable "repo_visibility" {
+  type = string
+  default = "public"
 }

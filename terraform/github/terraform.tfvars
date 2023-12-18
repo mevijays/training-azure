@@ -4,3 +4,4 @@ repos = [
     "repo3",
     "repo4"
 ]
+repo_visibility = "public"
