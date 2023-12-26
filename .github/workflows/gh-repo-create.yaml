@@ -14,7 +14,7 @@ permissions:
   id-token: 'write'
 jobs:
   repo_create:
-    runs-on: ubuntu-latest
+    runs-on: mylab-vm
     permissions: write-all
     env:
       TF_VAR_G_TOKEN: ${{ secrets.G_TOKEN }}
