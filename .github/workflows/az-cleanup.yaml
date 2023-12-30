@@ -1,0 +1,26 @@
+name: "Azure group cleanup"
+on: 
+   workflow_dispatch:
+   schedule:
+      - cron: '00 13 * * *'
+
+permissions:
+      id-token: write
+      contents: read
+jobs: 
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Az CLI login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  
+      - name: Azure CLI script
+        uses: azure/CLI@v1
+        with:
+          azcliversion: latest
+          inlineScript: |
+            az group list --query "[].name" -o tsv | xargs -I {} az group delete --yes --name {}
