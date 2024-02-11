@@ -104,7 +104,11 @@
 - Service principal 
 - OIDC token creation
 - Application authentication.
-
+## Exam materials update
+- [Exam sandbox] (https://go.microsoft.com/fwlink/?linkid=2226877)
+- [Study guide AZ104](https://learn.microsoft.com/en-gb/credentials/certifications/resources/study-guides/az-104)
+- [Study guide AZ900](https://learn.microsoft.com/en-gb/credentials/certifications/resources/study-guides/az-900)
+- [AZ-104 video exam preparation](https://learn.microsoft.com/en-us/shows/exam-readiness-zone/preparing-for-az-104-manage-azure-identities-and-governance-1-of-5)
 
 ## [docs](docs/readme.md)
 
