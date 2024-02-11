@@ -110,9 +110,6 @@
 
 
 
-## [Lab guide for AZ-900](https://microsoftlearning.github.io/AI-900-AIFundamentals/)
-
-
 ## [Lab guide for AZ-104](https://microsoftlearning.github.io/AZ-104-MicrosoftAzureAdministrator/)
 
 
