@@ -54,7 +54,7 @@ resource "github_branch" "this" {
   branch     = "develop"
 }
 
-resource "github_branch_protection_v3" "main" {
+resource "github_branch_protection_v3" "develop" {
   for_each   = toset(var.repos)
   repository = each.key
   branch     = "develop"
