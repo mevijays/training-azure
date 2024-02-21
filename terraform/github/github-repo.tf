@@ -15,7 +15,6 @@ terraform {
 }
 provider "github" {
  token  = var.G_TOKEN
- owner  = "mevijays"
 }
 
 variable "G_TOKEN" {
@@ -29,6 +28,11 @@ resource "github_repository" "main" {
   description = "My awesome codebase"
   visibility  = var.repo_visibility
   auto_init   = true
+  template {
+    owner                = "mevijays"
+    repository           = each.key
+    include_all_branches = true
+  }
 }
 resource "github_branch_protection_v3" "main" {
   for_each = toset(var.repos)
