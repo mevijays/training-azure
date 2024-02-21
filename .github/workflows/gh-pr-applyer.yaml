@@ -30,7 +30,7 @@ jobs:
              cp -r ../.github .
              git add --all
              git commit -m 'add'
-             git config user.email "sharmavijay86@gmail.com"
-             git config user.name "vijay kumar"
+             git config --global user.email "sharmavijay86@gmail.com"
+             git config --global user.name "vijay kumar"
              git push origin svg/branch
            done
