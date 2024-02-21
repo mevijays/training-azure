@@ -9,7 +9,7 @@ terraform {
     organization = "mevijays"
 
     workspaces {
-      name = "training-azure"
+      name = "github-repo"
     }
   }
 }
