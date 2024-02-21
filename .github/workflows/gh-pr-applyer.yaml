@@ -18,19 +18,48 @@ jobs:
     name: 'apply PR to repo'
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: clone repo
+      - uses: actions/checkout@v3
+      - name: Set working directory
         run: |
-          for repo in repo{1,2,3,4} 
-           do
-             git clone https://sharmavijay86:$G_TOKEN@github.com/mevijays/$repo
-             cd $repo
-             git checkout -b svg/branch
-             cp -r ../.github .
-             git add --all
-             git commit -m 'add'
-             git config --global user.email "sharmavijay86@gmail.com"
-             git config --global user.name "vijay kumar"
-             git push origin svg/branch
-           done
+          # Ensure we're in the root directory of the repository
+          cd $GITHUB_WORKSPACE
+
+      - name: Read repository list from file
+        id: read_repos
+        run: |
+          repositories=$(cat ./repo_list.txt)
+
+      - name: Clone and iterate over repositories
+        # Use GitHub's actions/checkout action for secure and reliable cloning
+        id: clone_and_process
+        uses: actions/checkout@v3
+        with:
+          repository: ${{ steps.read_repos.outputs.repositories }}
+          token: ${{ secrets.G_TOKEN }}  # Use a PAT with write access
+          ref: "main"  # Clone latest changes from 'master'
+          persist-credentials: true  # Avoid prompting for credentials for subsequent steps
+
+      - name: Check out feature branch (if not created)
+        id: checkout_feature_branch
+        if: ${{ steps.clone_and_process.outputs.branch_exists == false }}
+        run: |
+          git checkout -b feature/fix  
+
+      - name: Add specified files from workspace
+        id: add_files
+        run: |
+          find $GITHUB_WORKSPACE/repo_list.txt -maxdepth 1 -exec git add {} \;
+
+      - name: Commit changes with a clear message
+        id: commit_changes
+        if: ${{ steps.add_files.outputs.num_added > 0 }}  # Only commit if files were added
+        run: |
+          git commit -m "Added files for feature branch"
+
+      - name: Push changes to remote repository (if applicable)
+        id: push_changes
+        if: ${{ steps.commit_changes.outputs.commit_created == true }}
+        run: |
+          git config --global user.email "$GITHUB_ACTOR"
+          git config --global user.name "$GITHUB_ACTOR"
+          git push origin HEAD:feature/fix
