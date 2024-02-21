@@ -52,6 +52,7 @@ resource "github_branch" "this" {
   for_each   = toset(var.repos)
   repository = each.key
   branch     = "develop"
+  depends_on = [ github_repository.main ]
 }
 
 resource "github_branch_protection_v3" "develop" {
