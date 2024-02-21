@@ -53,3 +53,15 @@ resource "github_branch" "this" {
   repository = each.key
   branch     = "develop"
 }
+
+resource "github_branch_protection_v3" "main" {
+  for_each   = toset(var.repos)
+  repository = each.key
+  branch     = "develop"
+  required_pull_request_reviews {
+    require_code_owner_reviews      = true
+    required_approving_review_count = 1
+  }
+  depends_on = [ github_repository.main , github_branch.this ]
+}
+
