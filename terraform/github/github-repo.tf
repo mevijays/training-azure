@@ -26,7 +26,7 @@ variable "G_TOKEN" {
 resource "github_repository" "main" {
   for_each = toset(var.repos)
   name               = each.key
-  description        = "My awesome codebase"
+  description        = "My awesome codebase in ${ each.key}"
   visibility         = var.repo_visibility
   auto_init          = true
   has_issues         = false
@@ -35,18 +35,8 @@ resource "github_repository" "main" {
   has_projects       = false
   gitignore_template = "Terraform"
   default_branch     = "main"
-  security_and_analysis = {
-      secret_scanning = {
-        status = "enabled"
-       }
-      advanced_security = {
-        status = "enabled" 
-       }
-      secret_scanning_push_protection = {
-        status = "enabled"
-       }
-   }
 }
+
 resource "github_branch_protection_v3" "main" {
   for_each   = toset(var.repos)
   repository = each.key
