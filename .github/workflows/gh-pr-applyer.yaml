@@ -26,7 +26,7 @@ jobs:
            do
              git clone https://sharmavijay86:$G_TOKEN@github.com/mevijays/$repo
              cd $repo
-             git checkout branch -b svg/branch
+             git checkout -b svg/branch
              cp -r ../.github .
              git add --all
              git commit -m 'add'
