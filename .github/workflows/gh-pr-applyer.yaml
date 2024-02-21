@@ -45,7 +45,7 @@ jobs:
               \"base\": \"main\",
               \"body\": \"$PR_BODY\"
             }"
-            auth_header="Authorization: token $(echo -n "$G_TOKEN" | base64)"
+            auth_header="Authorization: Bearer $G_TOKEN"
             curl -X POST -H "$auth_header" -H "Content-Type: application/json" -d "$payload"  "$API_URL"
             echo "Pull request created successfully!"
           done
