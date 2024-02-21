@@ -1,0 +1,33 @@
+name: "GitHub repo applyer"
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: 'read'
+  id-token: 'write'
+jobs:
+  repo_apply:
+    runs-on: mylab-vm
+    permissions: write-all
+    env:
+      G_TOKEN: ${{ secrets.G_TOKEN }}
+
+    defaults:
+      run:
+        shell: bash
+    name: 'apply PR to repo'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: clone repo
+        run: |
+          for repo in repo{1,2,3,4} 
+           do
+             git clone https://sharmavijay86:$G_TOKEN@github.com/mevijays/$repo
+             cd $repo
+             git checkout branch -b svg/branch
+             cp -r ../.github .
+             git add --all
+             git commit -m 'add'
+             git push origin svg/branch
