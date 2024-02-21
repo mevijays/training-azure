@@ -36,6 +36,18 @@ jobs:
             git add --all
             git commit -m "new files added"
             git push origin HEAD:feature/fix
+            PR_TITLE="DEVOPS Push| new secuirty changes"
+            PR_BODY="DevOps automated pipeline is pusing the security changes. needs to merge immediatly!"
+            API_URL="https://api.github.com/repos/mevijays/$repo/pulls"
+            payload="{
+              \"title\": \"$PR_TITLE\",
+              \"head\": \"feature/fix\",
+              \"base\": \"main\",
+              \"body\": \"$PR_BODY\"
+            }"
+            auth_header="Authorization: token $(echo -n "$G_TOKEN" | base64)"
+            curl -X POST -H "$auth_header" -H "Content-Type: application/json" -d "$payload"  "$API_URL"
+            echo "Pull request created successfully!"
           done
             
 
