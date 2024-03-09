@@ -116,6 +116,7 @@ resource "azurerm_public_ip" "this" {
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
   allocation_method   = "Static"
+  sku                 = "Standard"
 }
 resource "azurerm_network_interface" "main" {
   count               = var.VMCOUNT
