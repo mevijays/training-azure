@@ -1,5 +1,5 @@
-![GitHub top language](https://img.shields.io/github/languages/top/mevijays/training-azure)   [![Setup vm lab](https://github.com/mevijays/training-azure/actions/workflows/setup-vm-labs.yaml/badge.svg?branch=main)](https://github.com/mevijays/training-azure/actions/workflows/setup-vm-labs.yaml)    [![VNET peering Lab](https://github.com/mevijays/training-azure/actions/workflows/lab-vnet-peering.yaml/badge.svg?branch=main)](https://github.com/mevijays/training-azure/actions/workflows/lab-vnet-peering.yaml)
-
+![Top Languages](https://img.shields.io/github/languages/top/mevijays/training-azure)   [![VM Setup](https://github.com/mevijays/training-azure/actions/workflows/setup-vm-labs.yaml/badge.svg?branch=main)](https://github.com/mevijays/training-azure/actions/workflows/setup-vm-labs.yaml)    [![Peering Lab](https://github.com/mevijays/training-azure/actions/workflows/lab-vnet-peering.yaml/badge.svg?branch=main)] (https://github.com/mevijays/training-azure/actions/workflows/lab-vnet-peering.yaml)   [![AZ Cleanup](https://github.com/mevijays/training-azure/actions/workflows/az-cleanup.yaml/badge.svg)](https://github.com/mevijays/training-azure/actions/workflows/az-cleanup.yaml)
+ 
 # Azure courses
 
 ## Introduction of cloud and Azure cloud
