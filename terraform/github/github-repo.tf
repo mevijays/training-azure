@@ -24,7 +24,7 @@ variable "G_TOKEN" {
 
 
 resource "github_repository" "main" {
-  for_each = toset(var.repos)
+  for_each = var.repos
   name               = each.key
   description        = "My awesome codebase in ${ each.key}"
   visibility         = each.value
