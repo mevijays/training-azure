@@ -1,7 +1,6 @@
-repos = [
-    "repo1",
-    "repo2",
-    "repo3",
-    "repo4"
-]
-repo_visibility = "public"
+repos = {
+   repo1 = "public"
+   repo2 = "public"
+   repo3 = "public"
+   repo4 = "private"
+}
