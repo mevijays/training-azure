@@ -38,7 +38,7 @@ resource "github_repository" "main" {
 }
 
 resource "github_branch_protection_v3" "main" {
-  for_each   = toset(var.repos)
+  for_each   = var.repos
   repository = each.key
   branch     = "main"
   required_pull_request_reviews {
@@ -49,14 +49,14 @@ resource "github_branch_protection_v3" "main" {
 }
 
 resource "github_branch" "this" {
-  for_each   = toset(var.repos)
+  for_each   = var.repos
   repository = each.key
   branch     = "develop"
   depends_on = [ github_repository.main ]
 }
 
 resource "github_branch_protection_v3" "develop" {
-  for_each   = toset(var.repos)
+  for_each   = var.repos
   repository = each.key
   branch     = "develop"
   required_pull_request_reviews {
