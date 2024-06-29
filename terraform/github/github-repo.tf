@@ -27,7 +27,7 @@ resource "github_repository" "main" {
   for_each = toset(var.repos)
   name               = each.key
   description        = "My awesome codebase in ${ each.key}"
-  visibility         = var.repo_visibility
+  visibility         = each.value
   auto_init          = true
   has_issues         = false
   has_discussions    = false
