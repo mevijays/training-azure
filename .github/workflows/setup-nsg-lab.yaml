@@ -1,0 +1,79 @@
+name: "Setup NSG lab"
+on:
+  workflow_dispatch:
+    inputs:
+      TFACTION:
+        description: "Terraform Action"
+        default: "apply"
+        required: true
+        type: choice
+        options:
+         - "apply"
+         - "destroy"
+      VMCOUNT:
+         description: "Virtual Machine counts"
+         default: "2"
+         required: true
+         type: text
+      PUBLIC:
+         description: "Enable public ip for VM?"
+         type: boolean
+         default: true
+      location:
+         type: string
+         default: "eastus"
+      rgname:
+         description: "ResourceGroup name"
+         type: string
+         default: "krlab"
+         
+permissions:
+  contents: 'read'
+  id-token: 'write'
+jobs:
+  vmsetup:
+    runs-on: ubuntu-latest
+ # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+    name: 'labsetup'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: 'Az CLI login'
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.4
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+      # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+      - name: Terraform Init
+        run: terraform  init
+        working-directory: terraform/nsglab
+
+    # Generates an execution plan for Terraform
+      - name: Terraform Plan
+        run: terraform  plan -input=false
+        working-directory: terraform/nsglab
+
+      - name: Terraform Apply
+        env:
+          TF_VAR_VMCOUNT: "${{ inputs.VMCOUNT }}"
+          TF_VAR_PUBLIC: ${{ inputs.PUBLIC }}
+          TF_VAR_location: ${{ inputs.location }}
+          TF_VAR_rgname: ${{ inputs.rgname }}
+        if: ${{ github.event.inputs.TFACTION == 'apply' }}
+        run: terraform  apply --auto-approve -input=false
+        working-directory: terraform/nsglab
+      - name: Terraform Destroy
+        if: ${{ github.event.inputs.TFACTION == 'destroy' }}
+        run: terraform destroy --auto-approve -input=false
+        working-directory: terraform/nsglab
