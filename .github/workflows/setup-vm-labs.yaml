@@ -20,6 +20,7 @@ on:
          type: boolean
          default: true
       location:
+         description: "Location for the resources"
          type: string
          default: "eastus"
       rgname:

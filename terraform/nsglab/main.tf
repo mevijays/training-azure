@@ -3,7 +3,7 @@ terraform {
   required_providers {
     azurerm = {
         source  = "hashicorp/azurerm"
-        version = "3.68.0"
+        version = "4.4.0"
     }
   }
    cloud {
@@ -16,13 +16,17 @@ terraform {
 }
 provider "azurerm" {
   use_oidc = true
+  subscription_id = var.subscription_id
   features {
      resource_group {
        prevent_deletion_if_contains_resources = false
      }
    }
 }
-
+variable "subscription_id" {
+  description = "Azure Subscription ID"
+  type        = string
+}
 variable "VMCOUNT" {
   description = "Number of VMs to create"
   type        = number
