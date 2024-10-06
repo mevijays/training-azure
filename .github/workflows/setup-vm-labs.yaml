@@ -14,7 +14,7 @@ on:
          description: "Virtual Machine counts"
          default: "2"
          required: true
-         type: text
+         type: string
       PUBLIC:
          description: "Enable public ip for VM?"
          type: boolean
@@ -31,12 +31,11 @@ permissions:
   contents: 'read'
   id-token: 'write'
 env:
-  ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-  ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-  ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-  ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-  TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
   TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  TF_VAR_VMCOUNT: ${{ inputs.VMCOUNT }}
+  TF_VAR_PUBLIC: ${{ inputs.PUBLIC }}
+  TF_VAR_location: ${{ inputs.location }}
+  TF_VAR_rgname: ${{ inputs.rgname }}
 jobs:
   vmsetup:
     runs-on: ubuntu-latest
@@ -58,7 +57,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
-          terraform_version: 1.5.4
+          terraform_version: 1.9.4
           cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
       # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
       - name: Terraform Init
@@ -71,11 +70,6 @@ jobs:
         working-directory: terraform/rgvnetvm
 
       - name: Terraform Apply
-        env:
-          TF_VAR_VMCOUNT: "${{ inputs.VMCOUNT }}"
-          TF_VAR_PUBLIC: ${{ inputs.PUBLIC }}
-          TF_VAR_location: ${{ inputs.location }}
-          TF_VAR_rgname: ${{ inputs.rgname }}
         if: ${{ github.event.inputs.TFACTION == 'apply' }}
         run: terraform  apply --auto-approve -input=false
         working-directory: terraform/rgvnetvm
