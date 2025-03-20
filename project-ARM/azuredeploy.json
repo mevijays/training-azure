@@ -1,0 +1,433 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "variables": {
+        "location": "[resourceGroup().location]",
+        "vmssName": "phpapp-vmss",
+        "instanceCount": 2,
+        "vmSize": "Standard_DS2_v2",
+        "adminUsername": "azureuser",
+        "adminPasswordOrKey": "YOUR-SSH-KEY-OR-PASSWORD-HERE",
+        "authenticationType": "sshPublicKey",
+        "customImageId": "/subscriptions/your-subscription-id/resourceGroups/your-resource-group/providers/Microsoft.Compute/images/your-custom-php-image",
+        "mysqlServerName": "[concat('mysql-phpapp-', uniqueString(resourceGroup().id))]",
+        "mysqlAdminLogin": "mysqladmin",
+        "mysqlAdminPassword": "ComplexP@ssw0rd!",
+        "mysqlDatabaseName": "phpappdb",
+        "applicationGatewayName": "phpapp-gateway",
+        "vmssPrefix": "[toLower(substring(concat(variables('vmssName'), uniqueString(resourceGroup().id)), 0, 9))]",
+        "vnetName": "[concat(variables('vmssPrefix'), '-vnet')]",
+        "vnetAddressPrefix": "10.0.0.0/16",
+        "vmssSubnetName": "vmss-subnet",
+        "vmssSubnetPrefix": "10.0.1.0/24",
+        "appGwSubnetName": "appgw-subnet",
+        "appGwSubnetPrefix": "10.0.2.0/24",
+        "mysqlSubnetName": "mysql-subnet",
+        "mysqlSubnetPrefix": "10.0.3.0/24",
+        "linuxConfiguration": {
+            "disablePasswordAuthentication": true,
+            "ssh": {
+                "publicKeys": [
+                    {
+                        "path": "[concat('/home/', variables('adminUsername'), '/.ssh/authorized_keys')]",
+                        "keyData": "[variables('adminPasswordOrKey')]"
+                    }
+                ]
+            }
+        },
+        "appGwPublicIPAddressName": "[concat(variables('applicationGatewayName'), '-pip')]",
+        "networkSecurityGroupName": "[concat(variables('vmssPrefix'), '-nsg')]",
+        "mysqlPrivateEndpointName": "[concat(variables('mysqlServerName'), '-endpoint')]",
+        "privateDnsZoneName": "privatelink.mysql.database.azure.com",
+        "privateDnsZoneLink": "[concat(variables('privateDnsZoneName'), '-link')]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2021-02-01",
+            "name": "[variables('networkSecurityGroupName')]",
+            "location": "[variables('location')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "allow-http",
+                        "properties": {
+                            "priority": 1000,
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "destinationPortRange": "80",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*"
+                        }
+                    },
+                    {
+                        "name": "allow-ssh",
+                        "properties": {
+                            "priority": 1100,
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "destinationPortRange": "22",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2021-02-01",
+            "name": "[variables('vnetName')]",
+            "location": "[variables('location')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('vnetAddressPrefix')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('vmssSubnetName')]",
+                        "properties": {
+                            "addressPrefix": "[variables('vmssSubnetPrefix')]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "[variables('appGwSubnetName')]",
+                        "properties": {
+                            "addressPrefix": "[variables('appGwSubnetPrefix')]"
+                        }
+                    },
+                    {
+                        "name": "[variables('mysqlSubnetName')]",
+                        "properties": {
+                            "addressPrefix": "[variables('mysqlSubnetPrefix')]",
+                            "privateEndpointNetworkPolicies": "Disabled"
+                        }
+                    }
+                ]
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2021-02-01",
+            "name": "[variables('appGwPublicIPAddressName')]",
+            "location": "[variables('location')]",
+            "sku": {
+                "name": "Standard"
+            },
+            "properties": {
+                "publicIPAddressVersion": "IPv4",
+                "publicIPAllocationMethod": "Static",
+                "idleTimeoutInMinutes": 4
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/flexibleServers",
+            "apiVersion": "2021-05-01",
+            "name": "[variables('mysqlServerName')]",
+            "location": "[variables('location')]",
+            "sku": {
+                "name": "Standard_B1s",
+                "tier": "Burstable"
+            },
+            "properties": {
+                "administratorLogin": "[variables('mysqlAdminLogin')]",
+                "administratorLoginPassword": "[variables('mysqlAdminPassword')]",
+                "version": "8.0.21",
+                "storage": {
+                    "storageSizeGB": 20
+                },
+                "backup": {
+                    "backupRetentionDays": 7,
+                    "geoRedundantBackup": "Disabled"
+                },
+                "highAvailability": {
+                    "mode": "Disabled"
+                },
+                "network": {
+                    "delegatedSubnetResourceId": null,
+                    "privateDnsZoneResourceId": null
+                }
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/flexibleServers/databases",
+            "apiVersion": "2021-05-01",
+            "name": "[concat(variables('mysqlServerName'), '/', variables('mysqlDatabaseName'))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/flexibleServers', variables('mysqlServerName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Network/privateDnsZones",
+            "apiVersion": "2020-06-01",
+            "name": "[variables('privateDnsZoneName')]",
+            "location": "global"
+        },
+        {
+            "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+            "apiVersion": "2020-06-01",
+            "name": "[variables('privateDnsZoneLink')]",
+            "location": "global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/privateDnsZones', variables('privateDnsZoneName'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]"
+            ],
+            "properties": {
+                "virtualNetwork": {
+                    "id": "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]"
+                },
+                "registrationEnabled": false
+            }
+        },
+        {
+            "type": "Microsoft.Network/privateEndpoints",
+            "apiVersion": "2021-02-01",
+            "name": "[variables('mysqlPrivateEndpointName')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/flexibleServers', variables('mysqlServerName'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]"
+            ],
+            "properties": {
+                "subnet": {
+                    "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetName'), variables('mysqlSubnetName'))]"
+                },
+                "privateLinkServiceConnections": [
+                    {
+                        "name": "MyMySqlConnection",
+                        "properties": {
+                            "privateLinkServiceId": "[resourceId('Microsoft.DBforMySQL/flexibleServers', variables('mysqlServerName'))]",
+                            "groupIds": [
+                                "mysqlServer"
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
+            "apiVersion": "2021-02-01",
+            "name": "[concat(variables('mysqlPrivateEndpointName'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/privateEndpoints', variables('mysqlPrivateEndpointName'))]",
+                "[resourceId('Microsoft.Network/privateDnsZones', variables('privateDnsZoneName'))]"
+            ],
+            "properties": {
+                "privateDnsZoneConfigs": [
+                    {
+                        "name": "config1",
+                        "properties": {
+                            "privateDnsZoneId": "[resourceId('Microsoft.Network/privateDnsZones', variables('privateDnsZoneName'))]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/applicationGateways",
+            "apiVersion": "2021-02-01",
+            "name": "[variables('applicationGatewayName')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]",
+                "[resourceId('Microsoft.Network/publicIPAddresses', variables('appGwPublicIPAddressName'))]",
+                "[resourceId('Microsoft.Compute/virtualMachineScaleSets', variables('vmssName'))]"
+            ],
+            "properties": {
+                "sku": {
+                    "name": "Standard_v2",
+                    "tier": "Standard_v2",
+                    "capacity": 2
+                },
+                "gatewayIPConfigurations": [
+                    {
+                        "name": "appGatewayIpConfig",
+                        "properties": {
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetName'), variables('appGwSubnetName'))]"
+                            }
+                        }
+                    }
+                ],
+                "frontendIPConfigurations": [
+                    {
+                        "name": "appGwPublicFrontendIp",
+                        "properties": {
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('appGwPublicIPAddressName'))]"
+                            }
+                        }
+                    }
+                ],
+                "frontendPorts": [
+                    {
+                        "name": "port_80",
+                        "properties": {
+                            "port": 80
+                        }
+                    }
+                ],
+                "backendAddressPools": [
+                    {
+                        "name": "vmssBackendPool",
+                        "properties": {
+                            "backendAddresses": []
+                        }
+                    }
+                ],
+                "backendHttpSettingsCollection": [
+                    {
+                        "name": "http-settings",
+                        "properties": {
+                            "port": 80,
+                            "protocol": "Http",
+                            "cookieBasedAffinity": "Disabled",
+                            "requestTimeout": 30,
+                            "pickHostNameFromBackendAddress": false
+                        }
+                    }
+                ],
+                "httpListeners": [
+                    {
+                        "name": "http-listener",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[resourceId('Microsoft.Network/applicationGateways/frontendIPConfigurations', variables('applicationGatewayName'), 'appGwPublicFrontendIp')]"
+                            },
+                            "frontendPort": {
+                                "id": "[resourceId('Microsoft.Network/applicationGateways/frontendPorts', variables('applicationGatewayName'), 'port_80')]"
+                            },
+                            "protocol": "Http",
+                            "requireServerNameIndication": false
+                        }
+                    }
+                ],
+                "requestRoutingRules": [
+                    {
+                        "name": "routing-rule",
+                        "properties": {
+                            "ruleType": "Basic",
+                            "httpListener": {
+                                "id": "[resourceId('Microsoft.Network/applicationGateways/httpListeners', variables('applicationGatewayName'), 'http-listener')]"
+                            },
+                            "backendAddressPool": {
+                                "id": "[resourceId('Microsoft.Network/applicationGateways/backendAddressPools', variables('applicationGatewayName'), 'vmssBackendPool')]"
+                            },
+                            "backendHttpSettings": {
+                                "id": "[resourceId('Microsoft.Network/applicationGateways/backendHttpSettingsCollection', variables('applicationGatewayName'), 'http-settings')]"
+                            }
+                        }
+                    }
+                ],
+                "enableHttp2": true,
+                "probes": []
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachineScaleSets",
+            "apiVersion": "2021-04-01",
+            "name": "[variables('vmssName')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]",
+                "[resourceId('Microsoft.Network/privateEndpoints', variables('mysqlPrivateEndpointName'))]"
+            ],
+            "sku": {
+                "name": "[variables('vmSize')]",
+                "tier": "Standard",
+                "capacity": "[variables('instanceCount')]"
+            },
+            "properties": {
+                "upgradePolicy": {
+                    "mode": "Manual"
+                },
+                "virtualMachineProfile": {
+                    "storageProfile": {
+                        "imageReference": {
+                            "id": "[variables('customImageId')]"
+                        },
+                        "osDisk": {
+                            "createOption": "FromImage",
+                            "caching": "ReadWrite",
+                            "managedDisk": {
+                                "storageAccountType": "Premium_LRS"
+                            }
+                        }
+                    },
+                    "osProfile": {
+                        "computerNamePrefix": "[variables('vmssPrefix')]",
+                        "adminUsername": "[variables('adminUsername')]",
+                        "adminPassword": "[variables('adminPasswordOrKey')]",
+                        "linuxConfiguration": "[if(equals(variables('authenticationType'), 'password'), json('null'), variables('linuxConfiguration'))]",
+                        "customData": "[base64(concat('#cloud-config\npackage_upgrade: true\npackages:\n  - apache2\n  - php\n  - php-mysql\n\nwrite_files:\n  - path: /var/www/html/index.php\n    content: |\n      <?php\n      $host = \"', variables('mysqlServerName'), '.mysql.database.azure.com\";\n      $username = \"', variables('mysqlAdminLogin'), '@', variables('mysqlServerName'), '\";\n      $password = \"', variables('mysqlAdminPassword'), '\";\n      $db_name = \"', variables('mysqlDatabaseName'), '\";\n\n      //Establishes the connection\n      $conn = mysqli_init();\n      mysqli_real_connect($conn, $host, $username, $password, $db_name, 3306, MYSQLI_CLIENT_SSL);\n      if (mysqli_connect_errno()) {\n          die(\"Failed to connect to MySQL: \".mysqli_connect_error());\n      }\n\n      // Test the connection\n      if ($conn) {\n          echo \"<h1>Connection to MySQL successful!</h1>\";\n          echo \"<h2>PHP Application is working correctly</h2>\";\n          echo \"<p>Connected to: $host</p>\";\n          echo \"<p>Database: $db_name</p>\";\n      } else {\n          echo \"<h1>Connection to MySQL failed</h1>\";\n      }\n      \n      // Close the connection\n      mysqli_close($conn);\n      ?>\n\nruncmd:\n  - service apache2 restart'))]"
+                    },
+                    "networkProfile": {
+                        "networkInterfaceConfigurations": [
+                            {
+                                "name": "[concat(variables('vmssPrefix'), '-nic')]",
+                                "properties": {
+                                    "primary": true,
+                                    "ipConfigurations": [
+                                        {
+                                            "name": "[concat(variables('vmssPrefix'), '-ipconfig')]",
+                                            "properties": {
+                                                "subnet": {
+                                                    "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetName'), variables('vmssSubnetName'))]"
+                                                },
+                                                "applicationGatewayBackendAddressPools": [
+                                                    {
+                                                        "id": "[resourceId('Microsoft.Network/applicationGateways/backendAddressPools', variables('applicationGatewayName'), 'vmssBackendPool')]"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "extensionProfile": {
+                        "extensions": [
+                            {
+                                "name": "health-extension",
+                                "properties": {
+                                    "publisher": "Microsoft.ManagedServices",
+                                    "type": "ApplicationHealthLinux",
+                                    "typeHandlerVersion": "1.0",
+                                    "autoUpgradeMinorVersion": true,
+                                    "settings": {
+                                        "protocol": "http",
+                                        "port": 80,
+                                        "requestPath": "/index.php"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                },
+                "overprovision": true,
+                "singlePlacementGroup": true,
+                "platformFaultDomainCount": 1
+            }
+        }
+    ],
+    "outputs": {
+        "applicationGatewayUrl": {
+            "type": "string",
+            "value": "[concat('http://', reference(resourceId('Microsoft.Network/publicIPAddresses', variables('appGwPublicIPAddressName'))).ipAddress)]"
+        }
+    }
+}
